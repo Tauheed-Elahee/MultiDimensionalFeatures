@@ -182,10 +182,12 @@ class SparseAutoencoder(HookedRootModule):
         if path.endswith(".pt"):
             try:
                 if torch.backends.mps.is_available():
-                    state_dict = torch.load(path, map_location="mps")
+                    state_dict = torch.load(
+                        path, map_location="mps", weights_only=False
+                    )
                     state_dict["cfg"].device = "mps"
                 else:
-                    state_dict = torch.load(path)
+                    state_dict = torch.load(path, weights_only=False)
             except Exception as e:
                 raise IOError(f"Error loading the state dictionary from .pt file: {e}")
 

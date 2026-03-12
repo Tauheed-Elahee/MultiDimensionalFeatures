@@ -25,6 +25,7 @@ class Problem:
     def __repr__(self):
         return str(self)
 
+
 def generate_and_save_acts(
     task,
     names_filter,
@@ -163,7 +164,9 @@ def get_all_acts(
     all_acts = []
     for i in range(0, len(all_problems)):
         tensors = torch.load(
-            task.prefix / f"{save_file_prefix}{i}.pt", map_location="cpu"
+            task.prefix / f"{save_file_prefix}{i}.pt",
+            map_location="cpu",
+            weights_only=False,
         )
         all_acts.append(tensors)
         if len(all_acts) > 1:
@@ -201,7 +204,7 @@ def get_acts(
                 torch.save(
                     all_acts[:, layer, token, :].detach().cpu().clone(), file_name
                 )
-    data = torch.load(file_name)
+    data = torch.load(file_name, weights_only=False)
     if normalize_rms:
         eps = 1e-5
         scale = (data.pow(2).mean(-1, keepdim=True) + eps).sqrt()
@@ -218,8 +221,18 @@ def get_acts_pca(
     names_filter=lambda x: "resid_post" in x or "hook_embed" in x,
     save_file_prefix="",
 ):
-    act_file_name = task.prefix / "pca" / save_file_prefix / f"layer{layer}_token{token}_pca{pca_k}{'_normalize' if normalize_rms else ''}.pt"
-    pca_pkl_file_name = task.prefix / "pca" / save_file_prefix / f"layer{layer}_token{token}_pca{pca_k}{'_normalize' if normalize_rms else ''}.pkl"
+    act_file_name = (
+        task.prefix
+        / "pca"
+        / save_file_prefix
+        / f"layer{layer}_token{token}_pca{pca_k}{'_normalize' if normalize_rms else ''}.pt"
+    )
+    pca_pkl_file_name = (
+        task.prefix
+        / "pca"
+        / save_file_prefix
+        / f"layer{layer}_token{token}_pca{pca_k}{'_normalize' if normalize_rms else ''}.pkl"
+    )
     (task.prefix / "pca" / save_file_prefix).mkdir(parents=True, exist_ok=True)
 
     if not act_file_name.exists() or not pca_pkl_file_name.exists():
@@ -235,12 +248,22 @@ def get_acts_pca(
         pca_acts = pca_object.transform(acts)
         torch.save(pca_acts, act_file_name)
         pkl.dump(pca_object, open(pca_pkl_file_name, "wb"))
-    return torch.load(act_file_name), pkl.load(open(pca_pkl_file_name, "rb"))
+    return torch.load(act_file_name, weights_only=False), pkl.load(
+        open(pca_pkl_file_name, "rb")
+    )
 
 
 def get_acts_pls(task, layer, token, pls_k, normalize_rms=False):
-    act_file_name = task.prefix / "pls" / f"layer{layer}_token{token}_pls{pls_k}{'_normalize' if normalize_rms else ''}.pt"
-    pls_pkl_file_name = task.prefix / "pls" / f"layer{layer}_token{token}_pls{pls_k}{'_normalize' if normalize_rms else ''}.pkl"
+    act_file_name = (
+        task.prefix
+        / "pls"
+        / f"layer{layer}_token{token}_pls{pls_k}{'_normalize' if normalize_rms else ''}.pt"
+    )
+    pls_pkl_file_name = (
+        task.prefix
+        / "pls"
+        / f"layer{layer}_token{token}_pls{pls_k}{'_normalize' if normalize_rms else ''}.pkl"
+    )
     (task.prefix / "pls").mkdir(parents=True, exist_ok=True)
 
     # if not os.path.exists(act_file_name) or not os.path.exists(pls_pkl_file_name):
@@ -255,7 +278,9 @@ def get_acts_pls(task, layer, token, pls_k, normalize_rms=False):
         torch.save(torch.tensor(pls_acts), act_file_name)
         pkl.dump(pls, open(pls_pkl_file_name, "wb"))
 
-    return torch.load(act_file_name), pkl.load(open(pls_pkl_file_name, "rb"))
+    return torch.load(act_file_name, weights_only=False), pkl.load(
+        open(pls_pkl_file_name, "rb")
+    )
 
 
 def _set_plotting_sizes():

@@ -40,7 +40,10 @@ def plot_intervention_on_circle_in_a(task, layer, pca_k, b):
         model = task.get_model()
 
         circle_projection_qr = torch.load(
-            task.prefix / f"circle_probes_{circle_letter}" / f"cos_sin_layer_{layer}_token_{token}_pca_{pca_k}.pt"
+            task.prefix
+            / f"circle_probes_{circle_letter}"
+            / f"cos_sin_layer_{layer}_token_{token}_pca_{pca_k}.pt",
+            weights_only=False,
         )
 
         for problem in task.generate_problems():
@@ -283,9 +286,13 @@ if __name__ == "__main__":
                         bs = range(1, 13)
                     for b in bs:
                         if task_level_granularity == "day":
-                            task = DaysOfWeekTask(device, model_name=model_name, dtype=args.dtype)
+                            task = DaysOfWeekTask(
+                                device, model_name=model_name, dtype=args.dtype
+                            )
                         elif task_level_granularity == "month":
-                            task = MonthsOfYearTask(device, model_name=model_name, dtype=args.dtype)
+                            task = MonthsOfYearTask(
+                                device, model_name=model_name, dtype=args.dtype
+                            )
                         else:
                             raise ValueError(f"Unknown {task_level_granularity}")
                         for pca_k in [5]:
