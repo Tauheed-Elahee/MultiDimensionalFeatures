@@ -42,7 +42,8 @@ def deconstruct(layer, n_feature_groups):
         + str(start_token + token)
         + "_pca"
         + str(n_pca_dims)
-        + ".pt"
+        + ".pt",
+        weights_only=False,
     )
     flat_activations = activations[order, :]  # problem, pca
     activations = flat_activations.reshape([mod, mod, n_pca_dims])
