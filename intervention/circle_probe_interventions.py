@@ -48,6 +48,9 @@ if not is_notebook():
         help="Device to use",
     )
     parser.add_argument(
+        "--dtype", type=str, default="float32", help="Data type for torch tensors"
+    )
+    parser.add_argument(
         "--use_inverse_regression_probe",
         action="store_true",
         help="Use inverse regression probe to find circle",
@@ -79,6 +82,7 @@ if not is_notebook():
     )
     args = parser.parse_args()
     device = args.device
+    dtype = args.dtype
     day_month_choice = args.problem_type
     circle_letter = args.intervene_on
     model_name = args.model
@@ -106,6 +110,7 @@ else:
     # intervention_pca_k = 5
 
     device = "cuda:4" if torch.cuda.is_available() else "cpu"
+    dtype = "float32"
     circle_letter = "c"
     day_month_choice = "day"
     model_name = "mistral"
@@ -136,9 +141,9 @@ if probe_on_centered_linear:
 # %%
 
 if day_month_choice == "day":
-    task = DaysOfWeekTask(device, model_name=model_name)
+    task = DaysOfWeekTask(device, model_name=model_name, dtype=dtype)
 else:
-    task = MonthsOfYearTask(device, model_name=model_name)
+    task = MonthsOfYearTask(device, model_name=model_name, dtype=dtype)
 
 # %%
 
@@ -267,7 +272,9 @@ for layer in list(layers_to_analyze):
                 "probe_r": probe_r,
                 "target_to_embedding": target_to_embedding,
             },
-            task.prefix / f"circle_probes_{circle_letter}" / f"{probe_file_extension}_layer_{layer}_token_{token}_pca_{pca_k}.pt",
+            task.prefix
+            / f"circle_probes_{circle_letter}"
+            / f"{probe_file_extension}_layer_{layer}_token_{token}_pca_{pca_k}.pt",
         )
 
         mae = (predictions - multid_targets_train).abs().mean()
@@ -382,7 +389,7 @@ for layer in layers_to_analyze:
         logit_diffs_zero_everything_but_circle,
     ) = get_logit_diffs_from_subspace_formula_resid_intervention(
         task,
-        probe_projection_qr=probe_projections[((layer, intervention_pca_k))],
+        probe_projection_qr=probe_projections[(layer, intervention_pca_k)],
         pca_k_project=intervention_pca_k,
         layer=layer,
         token=token,
