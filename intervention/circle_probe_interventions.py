@@ -44,7 +44,7 @@ if not is_notebook():
     parser.add_argument(
         "--device",
         type=str,
-        default="cuda:4" if torch.cuda.is_available() else "cpu",
+        default="cuda:0" if torch.cuda.is_available() else "cpu",
         help="Device to use",
     )
     parser.add_argument(
@@ -105,7 +105,7 @@ else:
     # use_inverse_regression_probe = False
     # intervention_pca_k = 5
 
-    device = "cuda:4" if torch.cuda.is_available() else "cpu"
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
     circle_letter = "c"
     day_month_choice = "day"
     model_name = "mistral"
@@ -382,7 +382,7 @@ for layer in layers_to_analyze:
         logit_diffs_zero_everything_but_circle,
     ) = get_logit_diffs_from_subspace_formula_resid_intervention(
         task,
-        probe_projection_qr=probe_projections[((layer, intervention_pca_k))],
+        probe_projection_qr=probe_projections[(layer, intervention_pca_k)],
         pca_k_project=intervention_pca_k,
         layer=layer,
         token=token,
