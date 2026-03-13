@@ -139,8 +139,12 @@ def save_coocurring_sae_features(model, ae, output_file, data):
         forward_pass = ae.forward(activations)
         if isinstance(forward_pass, tuple):
             hidden_sae = forward_pass[1]
-        else:
+        elif hasattr(forward_pass, "feature_acts"):
             hidden_sae = forward_pass.feature_acts
+        else:
+            # Newer sae_lens returns reconstructed tensor from forward();
+            # use encode() to get feature activations instead
+            hidden_sae = ae.encode(activations)
 
         nonzero_sae = hidden_sae.abs() > 1e-6
         nonzero_sae_values = hidden_sae[nonzero_sae]
