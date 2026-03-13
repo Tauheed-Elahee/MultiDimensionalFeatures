@@ -66,8 +66,8 @@ You can also directly download the gpt-2 layer 7 and Mistral-7B layer 8 activati
 
 You will also need to generate the actual clusters by running `clustering.py`, e.g.
 ```
-python3 clustering.py --model_name gpt-2 --clustering_type spectral --layer 7
-python3 clustering.py --model_name mistral --clustering_type graph --layer 8
+python3 clustering.py --model_name gpt-2 --method spectral --layer 7
+python3 clustering.py --model_name mistral --method graph --layer 8
 ```
 
 Unfortunately, we did not set a seed when we ran spectral clustering in our original experiments, so the clusters you get from the above command may not be the same as the ones we used in the paper. In the `sae_multid_feature_discovery` directory, we provide the GPT-2 (`gpt-2_layer_7_clusters_spectral_n1000.pkl`) and Mistral-7B (`mistral_layer_8_clusters_cutoff_0.5.pkl`) clusters that were used in the paper. For easy reference, here are the GPT-2 SAE feature indices for the days, weeks, and years clusters we reported in the paper (Figure 1):
