@@ -32,7 +32,7 @@ if args.model_name == "mistral":
     model_name = "mistral-7b"
     batch_size = 16
     layers_to_evaluate = [8, 16, 24]
-    num_devices = 2
+    num_devices = max(1, t.cuda.device_count())
     sae_hidden_size = 65536
 
 else:
