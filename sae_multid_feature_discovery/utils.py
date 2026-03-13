@@ -1,9 +1,9 @@
-
 from pathlib import Path
 from huggingface_hub import hf_hub_download
 import os
 
-BASE_DIR = Path(__file__).parent.parent / "cache"
+BASE_DIR = Path(os.environ.get("BASE_DIR", Path(__file__).parent.parent / "cache"))
+
 
 def get_gpt2_sae(device, layer):
     from sae_lens import SAE
@@ -11,7 +11,7 @@ def get_gpt2_sae(device, layer):
     return SAE.from_pretrained(
         release="gpt2-small-res-jb",  # see other options in sae_lens/pretrained_saes.yaml
         sae_id=f"blocks.{layer}.hook_resid_pre",  # won't always be a hook point
-        device=device
+        device=device,
     )[0]
 
 
