@@ -1,0 +1,27 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+type: command
+experiment_name: multidim-features
+description: Run MultiDimensionalFeatures experiment
+
+environment: azureml:multidim-features@latest
+compute: azureml:<your-gpu-cluster>
+
+command: >
+  python intervention/circle_probe_interventions.py
+  day a mistral
+  --device cuda:0
+  --dtype float16
+
+environment_variables:
+  BASE_DIR: /mnt/azureml/data/cache
+
+inputs:
+  cache_data:
+    type: uri_folder
+    path: azureml://datastores/<your-datastore>/paths/cache
+
+outputs:
+  results:
+    type: uri_folder
+    path: azureml://datastores/<your-datastore>/paths/results
+    mode: rw_mount
